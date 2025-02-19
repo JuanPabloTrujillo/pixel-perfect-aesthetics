@@ -7,24 +7,54 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Navbar from "../components/Navbar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const HOURS = Array.from({ length: 24 }, (_, i) => 
+  i.toString().padStart(2, '0') + ":00"
+);
+
+const RESERVATION_TYPES = [
+  "Reunión",
+  "Evento",
+  "Conferencia",
+  "Entrevista",
+  "Otros"
+];
 
 const Reservas = () => {
   const [date, setDate] = useState<Date>();
+  const [startTime, setStartTime] = useState<string>("");
+  const [endTime, setEndTime] = useState<string>("");
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [type, setType] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!date || !name || !email) {
+    if (!date || !startTime || !endTime || !name || !phone || !type) {
       toast.error("Por favor completa todos los campos");
+      return;
+    }
+
+    if (startTime >= endTime) {
+      toast.error("La hora de inicio debe ser anterior a la hora de fin");
       return;
     }
     
     // Aquí iría la lógica para guardar la reserva
     toast.success("¡Reserva creada con éxito!");
     setDate(undefined);
+    setStartTime("");
+    setEndTime("");
     setName("");
-    setEmail("");
+    setPhone("");
+    setType("");
   };
 
   return (
@@ -62,17 +92,67 @@ const Reservas = () => {
                     required
                   />
                 </div>
-                
+
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="phone">Teléfono</Label>
                   <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="tu@email.com"
+                    id="phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="Tu número de teléfono"
                     required
                   />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Tipo de reserva</Label>
+                  <Select value={type} onValueChange={setType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona el tipo de reserva" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {RESERVATION_TYPES.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Hora de inicio</Label>
+                    <Select value={startTime} onValueChange={setStartTime}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Inicio" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {HOURS.map((hour) => (
+                          <SelectItem key={hour} value={hour}>
+                            {hour}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Hora de fin</Label>
+                    <Select value={endTime} onValueChange={setEndTime}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Fin" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {HOURS.map((hour) => (
+                          <SelectItem key={hour} value={hour}>
+                            {hour}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
