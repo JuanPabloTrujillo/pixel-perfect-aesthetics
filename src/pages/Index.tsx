@@ -1,10 +1,10 @@
-
 import { useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import ServiceCard from '../components/ServiceCard';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import TestimonialCard from '../components/TestimonialCard';
+import { Code, Bot, Database, LineChart } from 'lucide-react';
 
 const Index = () => {
   const controls = useAnimation();
