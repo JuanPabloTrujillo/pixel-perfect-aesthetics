@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import ServiceCard from '../components/ServiceCard';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import TestimonialCard from '../components/TestimonialCard';
 
 const Index = () => {
   const controls = useAnimation();
@@ -167,30 +168,183 @@ const Index = () => {
             />
           </motion.div>
           
-          {/* Visual section */}
+          {/* Image Gallery Section - Replacing the Video */}
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            animate={controls}
+            className="mt-16 mb-20"
+          >
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 mb-4">
+                Transformando negocios con tecnología
+              </h2>
+              <p className="text-blue-100/70 max-w-3xl mx-auto">
+                Nuestras soluciones innovadoras impulsan la eficiencia y el crecimiento de empresas en diversos sectores.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <motion.div 
+                variants={itemVariants} 
+                className="rounded-xl overflow-hidden shadow-lg shadow-indigo-500/10 border border-white/10 h-64 relative group"
+              >
+                <img 
+                  src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80" 
+                  alt="Team collaboration" 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                  <h3 className="text-white font-medium">Equipos potenciados</h3>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                variants={itemVariants} 
+                className="rounded-xl overflow-hidden shadow-lg shadow-indigo-500/10 border border-white/10 h-64 relative group"
+              >
+                <img 
+                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80" 
+                  alt="Data visualization" 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                  <h3 className="text-white font-medium">Decisiones informadas</h3>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                variants={itemVariants} 
+                className="rounded-xl overflow-hidden shadow-lg shadow-indigo-500/10 border border-white/10 h-64 relative group"
+              >
+                <img 
+                  src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80" 
+                  alt="AI technology" 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                  <h3 className="text-white font-medium">Tecnología avanzada</h3>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+          
+          {/* Why Choose Us Section */}
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            animate={controls}
+            className="mb-20"
+          >
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 mb-4">
+                ¿Por qué elegirnos?
+              </h2>
+              <p className="text-blue-100/70 max-w-3xl mx-auto">
+                Descubre cómo nuestras soluciones pueden dar a tu empresa la ventaja competitiva que necesita.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
+              <motion.div variants={itemVariants} className="flex">
+                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center mr-4">
+                  <Code className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2 text-white">Soluciones personalizadas</h3>
+                  <p className="text-blue-100/70">
+                    Desarrollamos soluciones a medida que se adaptan perfectamente a tus necesidades específicas de negocio.
+                  </p>
+                </div>
+              </motion.div>
+              
+              <motion.div variants={itemVariants} className="flex">
+                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center mr-4">
+                  <Bot className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2 text-white">IA de vanguardia</h3>
+                  <p className="text-blue-100/70">
+                    Implementamos tecnologías de inteligencia artificial de última generación para mantener tu negocio a la cabeza.
+                  </p>
+                </div>
+              </motion.div>
+              
+              <motion.div variants={itemVariants} className="flex">
+                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center mr-4">
+                  <Database className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2 text-white">Análisis de datos profundo</h3>
+                  <p className="text-blue-100/70">
+                    Extraemos el valor oculto en tus datos, transformándolos en información estratégica para impulsar tu crecimiento.
+                  </p>
+                </div>
+              </motion.div>
+              
+              <motion.div variants={itemVariants} className="flex">
+                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center mr-4">
+                  <LineChart className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2 text-white">Resultados medibles</h3>
+                  <p className="text-blue-100/70">
+                    Ofrecemos métricas claras y objetivas que demuestran el retorno de tu inversión en nuestras soluciones.
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+          
+          {/* Testimonials Section */}
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            animate={controls}
+            className="mb-20"
+          >
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 mb-4">
+                Lo que dicen nuestros clientes
+              </h2>
+              <p className="text-blue-100/70 max-w-3xl mx-auto">
+                Empresas que ya han experimentado el poder transformador de nuestras soluciones.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <TestimonialCard 
+                quote="Desde que implementamos su solución de IA, nuestro rendimiento ha aumentado un 40% y los costos operativos se han reducido significativamente."
+                author="María Rodríguez"
+                position="Directora de Operaciones, TechSolve"
+                image="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=150&q=80"
+              />
+              
+              <TestimonialCard 
+                quote="Su análisis de datos nos permitió identificar oportunidades de mercado que no habíamos considerado. El ROI de este proyecto superó todas nuestras expectativas."
+                author="Carlos Mendoza"
+                position="CEO, Innova Consulting"
+                image="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=150&q=80"
+              />
+            </div>
+          </motion.div>
+          
+          {/* Call to Action */}
           <motion.div 
             variants={itemVariants}
             initial="hidden"
             animate={controls}
-            className="relative mx-auto mt-16 rounded-2xl overflow-hidden shadow-2xl shadow-indigo-500/10"
+            className="text-center py-12 px-6 rounded-2xl bg-gradient-to-r from-indigo-900/50 to-purple-900/50 border border-white/10 backdrop-blur-sm"
           >
-            <div className="aspect-video rounded-2xl overflow-hidden border border-white/10 backdrop-blur-sm bg-gradient-to-b from-indigo-900/30 to-purple-900/30">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <img 
-                  src="/lovable-uploads/311ddc8a-8caa-476b-bb80-f25d06c0d59e.png" 
-                  alt="AI Business Growth" 
-                  className="w-full h-full object-cover opacity-60"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/80 via-transparent to-transparent"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <button className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md border border-white/10 transition-transform duration-300 hover:scale-110 group">
-                    <svg className="w-8 h-8 text-white fill-current transform group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+              ¿Listo para transformar tu negocio?
+            </h2>
+            <p className="text-xl text-blue-100/80 max-w-3xl mx-auto mb-8">
+              Da el primer paso hacia el futuro digital de tu empresa. Nuestras soluciones te esperan.
+            </p>
+            <button className="px-8 py-4 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium text-lg shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all duration-300 transform hover:-translate-y-1">
+              Solicitar una demo gratuita
+            </button>
           </motion.div>
           
           {/* Stats section */}
