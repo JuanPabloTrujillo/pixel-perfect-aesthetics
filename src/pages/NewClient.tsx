@@ -21,16 +21,21 @@ import { ArrowLeft, LayoutDashboard, PlusCircle, Save, LogOut } from 'lucide-rea
 import { Link } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-interface ClientFormValues {
-  name: string;
-  email: string;
-  phone: string;
-  company: string;
-  address: string;
-  notes: string;
-  isActive: boolean;
-}
+// Define schema for form validation
+const clientFormSchema = z.object({
+  name: z.string().min(2, { message: "El nombre debe tener al menos 2 caracteres" }),
+  email: z.string().email({ message: "Email inválido" }),
+  phone: z.string().optional(),
+  company: z.string().optional(),
+  address: z.string().optional(),
+  notes: z.string().optional(),
+  isActive: z.boolean().default(true)
+});
+
+type ClientFormValues = z.infer<typeof clientFormSchema>;
 
 const NewClient = () => {
   const { user, logout } = useAuth();
@@ -38,6 +43,7 @@ const NewClient = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<ClientFormValues>({
+    resolver: zodResolver(clientFormSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -55,7 +61,7 @@ const NewClient = () => {
     // Simulate API call with timeout
     setTimeout(() => {
       console.log("Client data:", data);
-      toast.success("Client added successfully!");
+      toast.success("Cliente añadido exitosamente!");
       setIsSubmitting(false);
       navigate("/dashboard");
     }, 1000);
@@ -67,10 +73,10 @@ const NewClient = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center">
             <PlusCircle className="h-6 w-6 text-blue-600 mr-2" />
-            <h1 className="text-xl font-semibold text-gray-900">New Client</h1>
+            <h1 className="text-xl font-semibold text-gray-900">Nuevo Cliente</h1>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">Welcome, {user?.name}</span>
+            <span className="text-sm text-gray-600">Bienvenido, {user?.name}</span>
             <Button 
               variant="ghost" 
               size="sm" 
@@ -78,7 +84,7 @@ const NewClient = () => {
               className="flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               <LogOut className="h-4 w-4" />
-              Logout
+              Cerrar Sesión
             </Button>
           </div>
         </div>
@@ -89,13 +95,13 @@ const NewClient = () => {
           <Link to="/dashboard">
             <Button variant="outline" size="sm" className="flex items-center gap-1">
               <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
+              Volver al Dashboard
             </Button>
           </Link>
           <Link to="/">
             <Button variant="outline" size="sm" className="flex items-center gap-1">
               <LayoutDashboard className="h-4 w-4" />
-              Home
+              Inicio
             </Button>
           </Link>
         </div>
@@ -107,8 +113,8 @@ const NewClient = () => {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Add New Client</CardTitle>
-              <CardDescription>Enter your client's information below</CardDescription>
+              <CardTitle>Añadir Nuevo Cliente</CardTitle>
+              <CardDescription>Ingrese la información del cliente a continuación</CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
@@ -119,7 +125,7 @@ const NewClient = () => {
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Name *</FormLabel>
+                          <FormLabel>Nombre *</FormLabel>
                           <FormControl>
                             <Input placeholder="John Doe" required {...field} />
                           </FormControl>
@@ -147,7 +153,7 @@ const NewClient = () => {
                       name="phone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Phone</FormLabel>
+                          <FormLabel>Teléfono</FormLabel>
                           <FormControl>
                             <Input placeholder="+1 (555) 123-4567" {...field} />
                           </FormControl>
@@ -161,7 +167,7 @@ const NewClient = () => {
                       name="company"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Company</FormLabel>
+                          <FormLabel>Empresa</FormLabel>
                           <FormControl>
                             <Input placeholder="ABC Corporation" {...field} />
                           </FormControl>
@@ -176,7 +182,7 @@ const NewClient = () => {
                     name="address"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Address</FormLabel>
+                        <FormLabel>Dirección</FormLabel>
                         <FormControl>
                           <Input placeholder="123 Main St, City, Country" {...field} />
                         </FormControl>
@@ -190,9 +196,9 @@ const NewClient = () => {
                     name="notes"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Notes</FormLabel>
+                        <FormLabel>Notas</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Any additional information about the client" {...field} />
+                          <Textarea placeholder="Información adicional sobre el cliente" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -211,9 +217,9 @@ const NewClient = () => {
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel>Active Client</FormLabel>
+                          <FormLabel>Cliente Activo</FormLabel>
                           <FormDescription>
-                            This client is currently active and working with us
+                            Este cliente está actualmente activo y trabajando con nosotros
                           </FormDescription>
                         </div>
                       </FormItem>
@@ -226,7 +232,7 @@ const NewClient = () => {
                     disabled={isSubmitting}
                   >
                     <Save className="h-4 w-4" />
-                    {isSubmitting ? "Saving..." : "Save Client"}
+                    {isSubmitting ? "Guardando..." : "Guardar Cliente"}
                   </Button>
                 </form>
               </Form>

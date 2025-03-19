@@ -1,4 +1,3 @@
-
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -180,52 +179,54 @@ const Dashboard = () => {
                     <CardContent>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <RechartsLineChart data={lineChartData}>
-                            <ChartTooltip 
-                              content={({ active, payload }) => {
-                                if (active && payload && payload.length) {
-                                  return (
-                                    <div className="rounded-lg border bg-background p-2 shadow-sm">
-                                      <div className="grid grid-cols-2 gap-2">
-                                        <div className="flex flex-col">
-                                          <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                            Ventas
-                                          </span>
-                                          <span className="font-bold text-blue-500">
-                                            {payload[0].value}
-                                          </span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                          <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                            Renovaciones
-                                          </span>
-                                          <span className="font-bold text-purple-500">
-                                            {payload[1].value}
-                                          </span>
+                          <ChartContainer>
+                            <RechartsLineChart data={lineChartData}>
+                              <ChartTooltip 
+                                content={({ active, payload }) => {
+                                  if (active && payload && payload.length) {
+                                    return (
+                                      <div className="rounded-lg border bg-background p-2 shadow-sm">
+                                        <div className="grid grid-cols-2 gap-2">
+                                          <div className="flex flex-col">
+                                            <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                              Ventas
+                                            </span>
+                                            <span className="font-bold text-blue-500">
+                                              {payload[0].value}
+                                            </span>
+                                          </div>
+                                          <div className="flex flex-col">
+                                            <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                              Renovaciones
+                                            </span>
+                                            <span className="font-bold text-purple-500">
+                                              {payload[1].value}
+                                            </span>
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                  )
-                                }
-                                return null
-                              }}
-                            />
-                            <Line
-                              type="monotone"
-                              dataKey="ventas"
-                              stroke="#3b82f6"
-                              strokeWidth={2}
-                              dot={{ r: 4 }}
-                              activeDot={{ r: 6 }}
-                            />
-                            <Line
-                              type="monotone"
-                              dataKey="renovaciones"
-                              stroke="#8b5cf6"
-                              strokeWidth={2}
-                              dot={{ r: 4 }}
-                            />
-                          </RechartsLineChart>
+                                    )
+                                  }
+                                  return null
+                                }}
+                              />
+                              <Line
+                                type="monotone"
+                                dataKey="ventas"
+                                stroke="#3b82f6"
+                                strokeWidth={2}
+                                dot={{ r: 4 }}
+                                activeDot={{ r: 6 }}
+                              />
+                              <Line
+                                type="monotone"
+                                dataKey="renovaciones"
+                                stroke="#8b5cf6"
+                                strokeWidth={2}
+                                dot={{ r: 4 }}
+                              />
+                            </RechartsLineChart>
+                          </ChartContainer>
                         </ResponsiveContainer>
                       </div>
                     </CardContent>
@@ -240,23 +241,25 @@ const Dashboard = () => {
                     <CardContent>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <RechartsPieChart>
-                            <Pie
-                              data={pieChartData}
-                              cx="50%"
-                              cy="50%"
-                              labelLine={false}
-                              outerRadius={80}
-                              fill="#8884d8"
-                              dataKey="value"
-                              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                            >
-                              {pieChartData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                              ))}
-                            </Pie>
-                            <ChartTooltip content={<ChartTooltipContent />} />
-                          </RechartsPieChart>
+                          <ChartContainer>
+                            <RechartsPieChart>
+                              <Pie
+                                data={pieChartData}
+                                cx="50%"
+                                cy="50%"
+                                labelLine={false}
+                                outerRadius={80}
+                                fill="#8884d8"
+                                dataKey="value"
+                                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                              >
+                                {pieChartData.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                              </Pie>
+                              <ChartTooltip content={<ChartTooltipContent />} />
+                            </RechartsPieChart>
+                          </ChartContainer>
                         </ResponsiveContainer>
                       </div>
                     </CardContent>
@@ -271,15 +274,17 @@ const Dashboard = () => {
                     <CardContent>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={barChartData}>
-                            <ChartTooltip content={<ChartTooltipContent />} />
-                            <Bar
-                              dataKey="valor"
-                              fill="#3b82f6"
-                              radius={4}
-                              label={{ position: 'top', fill: '#666' }}
-                            />
-                          </BarChart>
+                          <ChartContainer>
+                            <BarChart data={barChartData}>
+                              <ChartTooltip content={<ChartTooltipContent />} />
+                              <Bar
+                                dataKey="valor"
+                                fill="#3b82f6"
+                                radius={4}
+                                label={{ position: 'top', fill: '#666' }}
+                              />
+                            </BarChart>
+                          </ChartContainer>
                         </ResponsiveContainer>
                       </div>
                     </CardContent>
