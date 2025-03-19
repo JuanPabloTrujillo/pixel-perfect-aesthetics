@@ -2,13 +2,15 @@
 import { motion } from 'framer-motion';
 
 interface TestimonialCardProps {
-  quote: string;
-  author: string;
-  position: string;
-  image: string;
+  testimonial: {
+    id: number;
+    name: string;
+    company: string;
+    testimonial: string;
+  }
 }
 
-const TestimonialCard = ({ quote, author, position, image }: TestimonialCardProps) => {
+const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -33,19 +35,15 @@ const TestimonialCard = ({ quote, author, position, image }: TestimonialCardProp
         </svg>
       </div>
       
-      <p className="text-blue-100/80 mb-6 italic">{quote}</p>
+      <p className="text-blue-100/80 mb-6 italic">{testimonial.testimonial}</p>
       
       <div className="flex items-center">
-        <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
-          <img 
-            src={image} 
-            alt={author} 
-            className="w-full h-full object-cover"
-          />
+        <div className="w-12 h-12 rounded-full overflow-hidden mr-4 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+          <span className="text-white font-bold text-lg">{testimonial.name.charAt(0)}</span>
         </div>
         <div>
-          <h4 className="font-medium text-white">{author}</h4>
-          <p className="text-sm text-blue-100/60">{position}</p>
+          <h4 className="font-medium text-white">{testimonial.name}</h4>
+          <p className="text-sm text-blue-100/60">{testimonial.company}</p>
         </div>
       </div>
     </motion.div>
