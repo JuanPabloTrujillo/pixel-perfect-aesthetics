@@ -6,7 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2, Clock, Calendar as CalendarIcon, User, Phone, Check } from "lucide-react";
+import { 
+  Trash2, Clock, Calendar as CalendarIcon, 
+  User, Phone, Check, Search, Filter 
+} from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "../components/Navbar";
 import {
@@ -16,6 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const HOURS = Array.from({ length: 24 }, (_, i) => 
   i.toString().padStart(2, '0') + ":00"
@@ -33,11 +41,11 @@ const RESERVATION_TYPES = [
 
 // Datos de ejemplo para el histórico y métricas
 const RESERVATIONS_SAMPLE = [
-  { id: 1, date: new Date(2025, 3, 10), startTime: "09:00", endTime: "10:00", name: "Carlos Rodríguez", phone: "612345678", type: "Limpieza dental", status: "completed" },
-  { id: 2, date: new Date(2025, 3, 12), startTime: "11:00", endTime: "12:00", name: "María López", phone: "623456789", type: "Revisión", status: "upcoming" },
-  { id: 3, date: new Date(2025, 3, 15), startTime: "16:00", endTime: "17:30", name: "Jorge Martín", phone: "634567890", type: "Tratamiento de conducto", status: "upcoming" },
-  { id: 4, date: new Date(2025, 3, 8), startTime: "10:00", endTime: "11:00", name: "Ana Sánchez", phone: "645678901", type: "Extracción", status: "cancelled" },
-  { id: 5, date: new Date(2025, 3, 5), startTime: "15:00", endTime: "16:00", name: "Pablo Gómez", phone: "656789012", type: "Ortodoncia", status: "completed" },
+  { id: 1, date: new Date(2025, 3, 10), startTime: "09:00", endTime: "10:00", name: "Carlos Rodríguez", phone: "612345678", type: "Limpieza dental", status: "completed", document: "12345678A" },
+  { id: 2, date: new Date(2025, 3, 12), startTime: "11:00", endTime: "12:00", name: "María López", phone: "623456789", type: "Revisión", status: "upcoming", document: "23456789B" },
+  { id: 3, date: new Date(2025, 3, 15), startTime: "16:00", endTime: "17:30", name: "Jorge Martín", phone: "634567890", type: "Tratamiento de conducto", status: "upcoming", document: "34567890C" },
+  { id: 4, date: new Date(2025, 3, 8), startTime: "10:00", endTime: "11:00", name: "Ana Sánchez", phone: "645678901", type: "Extracción", status: "cancelled", document: "45678901D" },
+  { id: 5, date: new Date(2025, 3, 5), startTime: "15:00", endTime: "16:00", name: "Pablo Gómez", phone: "656789012", type: "Ortodoncia", status: "completed", document: "56789012E" },
 ];
 
 // Métricas para el dashboard
@@ -55,8 +63,15 @@ const Reservas = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [type, setType] = useState("");
+  const [document, setDocument] = useState("");
   const [activeTab, setActiveTab] = useState("create");
   const [reservations, setReservations] = useState(RESERVATIONS_SAMPLE);
+  
+  // Filtros
+  const [filterType, setFilterType] = useState("");
+  const [filterDocument, setFilterDocument] = useState("");
+  const [filterDate, setFilterDate] = useState<Date | undefined>(undefined);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +94,7 @@ const Reservas = () => {
       name,
       phone,
       type,
+      document,
       status: "upcoming"
     };
     
@@ -92,6 +108,7 @@ const Reservas = () => {
     setName("");
     setPhone("");
     setType("");
+    setDocument("");
   };
 
   const handleCancelReservation = (id: number) => {
@@ -105,10 +122,23 @@ const Reservas = () => {
     toast.success("Reserva cancelada correctamente");
   };
 
-  // Filtrado de reservas según la pestaña
+  const resetFilters = () => {
+    setFilterType("");
+    setFilterDocument("");
+    setFilterDate(undefined);
+  };
+
+  // Filtrado de reservas según la pestaña y los filtros aplicados
   const filteredReservations = reservations.filter(reservation => {
-    if (activeTab === "upcoming") return reservation.status === "upcoming";
-    if (activeTab === "history") return reservation.status === "completed" || reservation.status === "cancelled";
+    // Filtro por pestaña
+    if (activeTab === "upcoming" && reservation.status !== "upcoming") return false;
+    if (activeTab === "history" && (reservation.status !== "completed" && reservation.status !== "cancelled")) return false;
+    
+    // Filtros adicionales
+    if (filterType && reservation.type !== filterType) return false;
+    if (filterDocument && !reservation.document?.toLowerCase().includes(filterDocument.toLowerCase())) return false;
+    if (filterDate && filterDate.toDateString() !== reservation.date.toDateString()) return false;
+    
     return true;
   });
 
@@ -166,8 +196,10 @@ const Reservas = () => {
                       mode="single"
                       selected={date}
                       onSelect={setDate}
-                      className="rounded-md"
+                      className="rounded-md pointer-events-auto"
                       disabled={(date) => date < new Date()}
+                      weekStartsOn={1}
+                      view="week"
                     />
                   </CardContent>
                 </Card>
@@ -190,6 +222,17 @@ const Reservas = () => {
                           required
                         />
                       </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="document">Cédula / Documento</Label>
+                      <Input
+                        id="document"
+                        value={document}
+                        onChange={(e) => setDocument(e.target.value)}
+                        placeholder="Número de documento"
+                        required
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -276,7 +319,73 @@ const Reservas = () => {
             <TabsContent value="upcoming">
               <Card>
                 <CardHeader>
-                  <CardTitle>Próximas citas</CardTitle>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>Próximas citas</CardTitle>
+                    <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="gap-2">
+                          <Filter className="h-4 w-4" />
+                          Filtrar
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80">
+                        <div className="grid gap-4">
+                          <h3 className="font-medium">Filtros de búsqueda</h3>
+                          <div className="space-y-2">
+                            <Label htmlFor="filter-type">Tipo de tratamiento</Label>
+                            <Select value={filterType} onValueChange={setFilterType}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Todos los tipos" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="">Todos</SelectItem>
+                                {RESERVATION_TYPES.map((type) => (
+                                  <SelectItem key={type} value={type}>
+                                    {type}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="filter-document">Cédula/Documento</Label>
+                            <div className="flex items-center space-x-2">
+                              <Input
+                                id="filter-document"
+                                placeholder="Buscar por documento"
+                                value={filterDocument}
+                                onChange={(e) => setFilterDocument(e.target.value)}
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="filter-date">Fecha específica</Label>
+                            <Calendar
+                              mode="single"
+                              selected={filterDate}
+                              onSelect={setFilterDate}
+                              className="rounded-md"
+                              weekStartsOn={1}
+                            />
+                          </div>
+                          
+                          <div className="flex justify-between">
+                            <Button
+                              variant="outline"
+                              onClick={resetFilters}
+                            >
+                              Resetear filtros
+                            </Button>
+                            <Button onClick={() => setIsFilterOpen(false)}>
+                              Aplicar filtros
+                            </Button>
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {filteredReservations.length === 0 ? (
@@ -298,6 +407,9 @@ const Reservas = () => {
                                   {reservation.startTime} - {reservation.endTime}
                                 </div>
                                 <p>{reservation.type}</p>
+                                {reservation.document && (
+                                  <p className="text-xs">Doc: {reservation.document}</p>
+                                )}
                               </div>
                             </div>
                             <Button
@@ -321,7 +433,73 @@ const Reservas = () => {
             <TabsContent value="history">
               <Card>
                 <CardHeader>
-                  <CardTitle>Historial de citas</CardTitle>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>Historial de citas</CardTitle>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="gap-2">
+                          <Filter className="h-4 w-4" />
+                          Filtrar
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80">
+                        <div className="grid gap-4">
+                          <h3 className="font-medium">Filtros de búsqueda</h3>
+                          <div className="space-y-2">
+                            <Label htmlFor="filter-type">Tipo de tratamiento</Label>
+                            <Select value={filterType} onValueChange={setFilterType}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Todos los tipos" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="">Todos</SelectItem>
+                                {RESERVATION_TYPES.map((type) => (
+                                  <SelectItem key={type} value={type}>
+                                    {type}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="filter-document">Cédula/Documento</Label>
+                            <div className="flex items-center space-x-2">
+                              <Input
+                                id="filter-document"
+                                placeholder="Buscar por documento"
+                                value={filterDocument}
+                                onChange={(e) => setFilterDocument(e.target.value)}
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="filter-date">Fecha específica</Label>
+                            <Calendar
+                              mode="single"
+                              selected={filterDate}
+                              onSelect={setFilterDate}
+                              className="rounded-md"
+                              weekStartsOn={1}
+                            />
+                          </div>
+                          
+                          <div className="flex justify-between">
+                            <Button
+                              variant="outline"
+                              onClick={resetFilters}
+                            >
+                              Resetear filtros
+                            </Button>
+                            <Button onClick={() => setIsFilterOpen(false)}>
+                              Aplicar filtros
+                            </Button>
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {filteredReservations.length === 0 ? (
@@ -332,6 +510,7 @@ const Reservas = () => {
                         <thead>
                           <tr className="border-b">
                             <th className="py-3 text-left font-medium">Paciente</th>
+                            <th className="py-3 text-left font-medium">Documento</th>
                             <th className="py-3 text-left font-medium">Fecha</th>
                             <th className="py-3 text-left font-medium">Hora</th>
                             <th className="py-3 text-left font-medium">Tratamiento</th>
@@ -342,6 +521,7 @@ const Reservas = () => {
                           {filteredReservations.map((reservation) => (
                             <tr key={reservation.id} className="border-b">
                               <td className="py-3">{reservation.name}</td>
+                              <td className="py-3">{reservation.document}</td>
                               <td className="py-3">{reservation.date.toLocaleDateString()}</td>
                               <td className="py-3">{reservation.startTime} - {reservation.endTime}</td>
                               <td className="py-3">{reservation.type}</td>
