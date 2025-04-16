@@ -1,10 +1,12 @@
 
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Trash2, Clock, Calendar as CalendarIcon, User, Phone, Check } from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "../components/Navbar";
 import {
@@ -20,11 +22,30 @@ const HOURS = Array.from({ length: 24 }, (_, i) =>
 );
 
 const RESERVATION_TYPES = [
-  "Reunión",
-  "Evento",
-  "Conferencia",
-  "Entrevista",
+  "Limpieza dental",
+  "Revisión",
+  "Tratamiento de conducto",
+  "Extracción",
+  "Ortodoncia",
+  "Prótesis",
   "Otros"
+];
+
+// Datos de ejemplo para el histórico y métricas
+const RESERVATIONS_SAMPLE = [
+  { id: 1, date: new Date(2025, 3, 10), startTime: "09:00", endTime: "10:00", name: "Carlos Rodríguez", phone: "612345678", type: "Limpieza dental", status: "completed" },
+  { id: 2, date: new Date(2025, 3, 12), startTime: "11:00", endTime: "12:00", name: "María López", phone: "623456789", type: "Revisión", status: "upcoming" },
+  { id: 3, date: new Date(2025, 3, 15), startTime: "16:00", endTime: "17:30", name: "Jorge Martín", phone: "634567890", type: "Tratamiento de conducto", status: "upcoming" },
+  { id: 4, date: new Date(2025, 3, 8), startTime: "10:00", endTime: "11:00", name: "Ana Sánchez", phone: "645678901", type: "Extracción", status: "cancelled" },
+  { id: 5, date: new Date(2025, 3, 5), startTime: "15:00", endTime: "16:00", name: "Pablo Gómez", phone: "656789012", type: "Ortodoncia", status: "completed" },
+];
+
+// Métricas para el dashboard
+const METRICS = [
+  { title: "Citas Totales", value: "128", description: "Este mes" },
+  { title: "Tratamientos", value: "43", description: "En progreso" },
+  { title: "Disponibilidad", value: "68%", description: "Sillas disponibles" },
+  { title: "Satisfacción", value: "97%", description: "De pacientes" },
 ];
 
 const Reservas = () => {
@@ -34,6 +55,8 @@ const Reservas = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [type, setType] = useState("");
+  const [activeTab, setActiveTab] = useState("create");
+  const [reservations, setReservations] = useState(RESERVATIONS_SAMPLE);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,8 +70,22 @@ const Reservas = () => {
       return;
     }
     
-    // Aquí iría la lógica para guardar la reserva
+    // Agregar nueva reserva al listado
+    const newReservation = {
+      id: reservations.length + 1,
+      date: date,
+      startTime,
+      endTime,
+      name,
+      phone,
+      type,
+      status: "upcoming"
+    };
+    
+    setReservations([...reservations, newReservation]);
     toast.success("¡Reserva creada con éxito!");
+    
+    // Limpiar formulario
     setDate(undefined);
     setStartTime("");
     setEndTime("");
@@ -57,117 +94,276 @@ const Reservas = () => {
     setType("");
   };
 
+  const handleCancelReservation = (id: number) => {
+    setReservations(
+      reservations.map(reservation => 
+        reservation.id === id 
+          ? { ...reservation, status: "cancelled" } 
+          : reservation
+      )
+    );
+    toast.success("Reserva cancelada correctamente");
+  };
+
+  // Filtrado de reservas según la pestaña
+  const filteredReservations = reservations.filter(reservation => {
+    if (activeTab === "upcoming") return reservation.status === "upcoming";
+    if (activeTab === "history") return reservation.status === "completed" || reservation.status === "cancelled";
+    return true;
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <main className="pt-28 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-foreground mb-8 text-center">
-            Realiza tu reserva
+      <main className="pt-20 pb-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Logo y Métricas */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center">
+                <CalendarIcon className="h-8 w-8 text-primary mr-2" />
+                <h1 className="text-2xl font-bold">Dental Care Plus</h1>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {METRICS.map((metric, index) => (
+                <Card key={index}>
+                  <CardHeader className="p-4 pb-2">
+                    <p className="text-sm text-muted-foreground">{metric.title}</p>
+                  </CardHeader>
+                  <CardContent className="p-4 pt-0">
+                    <div className="text-2xl font-bold">{metric.value}</div>
+                    <p className="text-xs text-muted-foreground mt-1">{metric.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+          
+          <h1 className="text-3xl font-bold text-foreground mb-6 text-center">
+            Sistema de Reservas
           </h1>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Calendario */}
-            <Card className="p-4">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                className="rounded-md"
-                disabled={(date) => date < new Date()}
-              />
-            </Card>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-8">
+            <TabsList className="grid grid-cols-3 mb-8">
+              <TabsTrigger value="create">Crear Reserva</TabsTrigger>
+              <TabsTrigger value="upcoming">Próximas Citas</TabsTrigger>
+              <TabsTrigger value="history">Historial</TabsTrigger>
+            </TabsList>
             
-            {/* Formulario */}
-            <Card className="p-6">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nombre</Label>
-                  <Input
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Tu nombre"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Teléfono</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="Tu número de teléfono"
-                    required
-                  />
-                </div>
+            {/* Pestaña: Crear Reserva */}
+            <TabsContent value="create">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Calendario */}
+                <Card className="p-4">
+                  <CardHeader className="pb-2">
+                    <CardTitle>Selecciona una fecha</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      className="rounded-md"
+                      disabled={(date) => date < new Date()}
+                    />
+                  </CardContent>
+                </Card>
                 
-                <div className="space-y-2">
-                  <Label>Tipo de reserva</Label>
-                  <Select value={type} onValueChange={setType}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona el tipo de reserva" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {RESERVATION_TYPES.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
+                {/* Formulario */}
+                <Card className="p-6">
+                  <CardHeader className="px-0 pt-0 pb-4">
+                    <CardTitle>Detalles de la cita</CardTitle>
+                  </CardHeader>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Nombre del Paciente</Label>
+                      <div className="flex items-center space-x-2">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="name"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          placeholder="Nombre completo"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Teléfono de Contacto</Label>
+                      <div className="flex items-center space-x-2">
+                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="Número de teléfono"
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Tipo de tratamiento</Label>
+                      <Select value={type} onValueChange={setType}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecciona el tipo de tratamiento" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {RESERVATION_TYPES.map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {type}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Hora de inicio</Label>
+                        <Select value={startTime} onValueChange={setStartTime}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Inicio" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {HOURS.map((hour) => (
+                              <SelectItem key={hour} value={hour}>
+                                {hour}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Hora de fin</Label>
+                        <Select value={endTime} onValueChange={setEndTime}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Fin" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {HOURS.map((hour) => (
+                              <SelectItem key={hour} value={hour}>
+                                {hour}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Fecha seleccionada</Label>
+                      <p className="text-muted-foreground">
+                        {date ? date.toLocaleDateString() : "Selecciona una fecha"}
+                      </p>
+                    </div>
+                    
+                    <Button type="submit" className="w-full bg-primary">
+                      <Check className="mr-2 h-4 w-4" /> Confirmar reserva
+                    </Button>
+                  </form>
+                </Card>
+              </div>
+            </TabsContent>
+            
+            {/* Pestaña: Próximas Citas */}
+            <TabsContent value="upcoming">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Próximas citas</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {filteredReservations.length === 0 ? (
+                    <p className="text-center py-8 text-muted-foreground">No hay citas programadas</p>
+                  ) : (
+                    <div className="grid gap-4">
+                      {filteredReservations.map((reservation) => (
+                        <Card key={reservation.id} className="p-4 bg-accent/30">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="font-medium">{reservation.name}</h3>
+                              <div className="text-sm text-muted-foreground space-y-1 mt-1">
+                                <div className="flex items-center">
+                                  <CalendarIcon className="h-3.5 w-3.5 mr-1.5" />
+                                  {reservation.date.toLocaleDateString()}
+                                </div>
+                                <div className="flex items-center">
+                                  <Clock className="h-3.5 w-3.5 mr-1.5" />
+                                  {reservation.startTime} - {reservation.endTime}
+                                </div>
+                                <p>{reservation.type}</p>
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleCancelReservation(reservation.id)}
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </Card>
                       ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Hora de inicio</Label>
-                    <Select value={startTime} onValueChange={setStartTime}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Inicio" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {HOURS.map((hour) => (
-                          <SelectItem key={hour} value={hour}>
-                            {hour}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Hora de fin</Label>
-                    <Select value={endTime} onValueChange={setEndTime}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Fin" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {HOURS.map((hour) => (
-                          <SelectItem key={hour} value={hour}>
-                            {hour}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Fecha seleccionada</Label>
-                  <p className="text-muted">
-                    {date ? date.toLocaleDateString() : "Selecciona una fecha"}
-                  </p>
-                </div>
-                
-                <Button type="submit" className="w-full bg-accent-foreground">
-                  Confirmar reserva
-                </Button>
-              </form>
-            </Card>
-          </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            {/* Pestaña: Historial */}
+            <TabsContent value="history">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Historial de citas</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {filteredReservations.length === 0 ? (
+                    <p className="text-center py-8 text-muted-foreground">No hay historial de citas</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="py-3 text-left font-medium">Paciente</th>
+                            <th className="py-3 text-left font-medium">Fecha</th>
+                            <th className="py-3 text-left font-medium">Hora</th>
+                            <th className="py-3 text-left font-medium">Tratamiento</th>
+                            <th className="py-3 text-left font-medium">Estado</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredReservations.map((reservation) => (
+                            <tr key={reservation.id} className="border-b">
+                              <td className="py-3">{reservation.name}</td>
+                              <td className="py-3">{reservation.date.toLocaleDateString()}</td>
+                              <td className="py-3">{reservation.startTime} - {reservation.endTime}</td>
+                              <td className="py-3">{reservation.type}</td>
+                              <td className="py-3">
+                                <span className={`inline-block px-2 py-1 text-xs rounded-full ${
+                                  reservation.status === 'completed' 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {reservation.status === 'completed' ? 'Completada' : 'Cancelada'}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </div>
