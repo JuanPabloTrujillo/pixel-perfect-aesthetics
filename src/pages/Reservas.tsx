@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,7 +38,6 @@ const RESERVATION_TYPES = [
   "Otros"
 ];
 
-// Datos de ejemplo para el histórico y métricas
 const RESERVATIONS_SAMPLE = [
   { id: 1, date: new Date(2025, 3, 10), startTime: "09:00", endTime: "10:00", name: "Carlos Rodríguez", phone: "612345678", type: "Limpieza dental", status: "completed", document: "12345678A" },
   { id: 2, date: new Date(2025, 3, 12), startTime: "11:00", endTime: "12:00", name: "María López", phone: "623456789", type: "Revisión", status: "upcoming", document: "23456789B" },
@@ -48,7 +46,6 @@ const RESERVATIONS_SAMPLE = [
   { id: 5, date: new Date(2025, 3, 5), startTime: "15:00", endTime: "16:00", name: "Pablo Gómez", phone: "656789012", type: "Ortodoncia", status: "completed", document: "56789012E" },
 ];
 
-// Métricas para el dashboard
 const METRICS = [
   { title: "Citas Totales", value: "128", description: "Este mes" },
   { title: "Tratamientos", value: "43", description: "En progreso" },
@@ -67,7 +64,6 @@ const Reservas = () => {
   const [activeTab, setActiveTab] = useState("create");
   const [reservations, setReservations] = useState(RESERVATIONS_SAMPLE);
   
-  // Filtros
   const [filterType, setFilterType] = useState("");
   const [filterDocument, setFilterDocument] = useState("");
   const [filterDate, setFilterDate] = useState<Date | undefined>(undefined);
@@ -85,7 +81,6 @@ const Reservas = () => {
       return;
     }
     
-    // Agregar nueva reserva al listado
     const newReservation = {
       id: reservations.length + 1,
       date: date,
@@ -101,7 +96,6 @@ const Reservas = () => {
     setReservations([...reservations, newReservation]);
     toast.success("¡Reserva creada con éxito!");
     
-    // Limpiar formulario
     setDate(undefined);
     setStartTime("");
     setEndTime("");
@@ -128,13 +122,10 @@ const Reservas = () => {
     setFilterDate(undefined);
   };
 
-  // Filtrado de reservas según la pestaña y los filtros aplicados
   const filteredReservations = reservations.filter(reservation => {
-    // Filtro por pestaña
     if (activeTab === "upcoming" && reservation.status !== "upcoming") return false;
     if (activeTab === "history" && (reservation.status !== "completed" && reservation.status !== "cancelled")) return false;
     
-    // Filtros adicionales
     if (filterType && reservation.type !== filterType) return false;
     if (filterDocument && !reservation.document?.toLowerCase().includes(filterDocument.toLowerCase())) return false;
     if (filterDate && filterDate.toDateString() !== reservation.date.toDateString()) return false;
@@ -148,7 +139,6 @@ const Reservas = () => {
       
       <main className="pt-20 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          {/* Logo y Métricas */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
@@ -183,10 +173,8 @@ const Reservas = () => {
               <TabsTrigger value="history">Historial</TabsTrigger>
             </TabsList>
             
-            {/* Pestaña: Crear Reserva */}
             <TabsContent value="create">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Calendario */}
                 <Card className="p-4">
                   <CardHeader className="pb-2">
                     <CardTitle>Selecciona una fecha</CardTitle>
@@ -199,12 +187,10 @@ const Reservas = () => {
                       className="rounded-md pointer-events-auto"
                       disabled={(date) => date < new Date()}
                       weekStartsOn={1}
-                      view="week"
                     />
                   </CardContent>
                 </Card>
                 
-                {/* Formulario */}
                 <Card className="p-6">
                   <CardHeader className="px-0 pt-0 pb-4">
                     <CardTitle>Detalles de la cita</CardTitle>
@@ -315,7 +301,6 @@ const Reservas = () => {
               </div>
             </TabsContent>
             
-            {/* Pestaña: Próximas Citas */}
             <TabsContent value="upcoming">
               <Card>
                 <CardHeader>
@@ -429,7 +414,6 @@ const Reservas = () => {
               </Card>
             </TabsContent>
             
-            {/* Pestaña: Historial */}
             <TabsContent value="history">
               <Card>
                 <CardHeader>
