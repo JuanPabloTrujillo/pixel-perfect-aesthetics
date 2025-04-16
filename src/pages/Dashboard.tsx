@@ -33,6 +33,7 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  ChartConfig
 } from "@/components/ui/chart";
 import {
   Bar,
@@ -74,6 +75,24 @@ const Dashboard = () => {
     { name: "Salud", value: 20 },
     { name: "Viaje", value: 5 },
   ];
+
+  // Configuration for charts
+  const lineChartConfig: ChartConfig = {
+    ventas: { color: "#3b82f6", label: "Ventas" },
+    renovaciones: { color: "#8b5cf6", label: "Renovaciones" }
+  };
+
+  const pieChartConfig: ChartConfig = {
+    Auto: { color: '#0088FE', label: "Auto" },
+    Hogar: { color: '#00C49F', label: "Hogar" },
+    Vida: { color: '#FFBB28', label: "Vida" },
+    Salud: { color: '#FF8042', label: "Salud" },
+    Viaje: { color: '#8884D8', label: "Viaje" },
+  };
+
+  const barChartConfig: ChartConfig = {
+    valor: { color: "#3b82f6", label: "Valor" }
+  };
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
@@ -179,7 +198,7 @@ const Dashboard = () => {
                     <CardContent>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <ChartContainer>
+                          <ChartContainer config={lineChartConfig}>
                             <RechartsLineChart data={lineChartData}>
                               <ChartTooltip 
                                 content={({ active, payload }) => {
@@ -241,7 +260,7 @@ const Dashboard = () => {
                     <CardContent>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <ChartContainer>
+                          <ChartContainer config={pieChartConfig}>
                             <RechartsPieChart>
                               <Pie
                                 data={pieChartData}
@@ -274,7 +293,7 @@ const Dashboard = () => {
                     <CardContent>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <ChartContainer>
+                          <ChartContainer config={barChartConfig}>
                             <BarChart data={barChartData}>
                               <ChartTooltip content={<ChartTooltipContent />} />
                               <Bar
